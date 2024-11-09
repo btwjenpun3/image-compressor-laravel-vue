@@ -65,7 +65,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted } from 'vue'
 
 const page = usePage()
@@ -84,7 +84,6 @@ const form = useForm({
     recaptcha_token: null
 })
 
-// Menggunakan state lokal untuk images
 const images = ref(props.images)
 
 const file = ref(null)
@@ -99,20 +98,18 @@ const addImages = (event) => {
     }
 }
 
-// Load the reCAPTCHA script dynamically on mounted
 onMounted(() => {
     const script = document.createElement('script');
     script.src = `https://www.google.com/recaptcha/api.js?render=${props.recaptcha_key}`;
     document.head.appendChild(script);
 });
 
-// Function to handle reCAPTCHA and get token
 const getRecaptchaToken = () => {
     return new Promise((resolve, reject) => {
         grecaptcha.ready(() => {
             grecaptcha.execute(props.recaptcha_key, { action: 'submit' }).then((token) => {
                 if (token) {
-                    resolve(token); // Return token if successful
+                    resolve(token);
                 } else {
                     reject('Failed to get reCAPTCHA token');
                 }
@@ -121,20 +118,16 @@ const getRecaptchaToken = () => {
     });
 };
 
-// Function to handle image submission
 const submitImages = async () => {
     try {
-        // Get the reCAPTCHA token
         const token = await getRecaptchaToken();
 
-        // Set token to form
         form.recaptcha_token = token;
 
-        // Post the form with the token
         form.post('/upload', {
             data: {
                 images: form.images,
-                recaptcha_token: token // Send token to server for verification
+                recaptcha_token: token
             },
             onSuccess: (response) => {
                 images.value = response.props.images.map(image => ({
