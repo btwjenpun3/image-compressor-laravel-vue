@@ -5,7 +5,9 @@ This is a simple Image Compressor made with Laravel, Inertia, Vue, and Tailwind.
 
 And support ReCAPTCHA V3 for avoid bot uploader.
 
-This tools using <a href="https://image.intervention.io/v3">PHP Intervention Image</a> for compressing image.
+This tool using <a href="https://image.intervention.io/v3">PHP Intervention Image</a> for compressing image.
+
+Demo : <a href="https://compressor.muhamadhelmi.my.id/upload">compressor.muhamadhelmi.my.id</a>.
 
 ## How to Install
 
