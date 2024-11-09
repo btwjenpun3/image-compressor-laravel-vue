@@ -73,8 +73,8 @@ class ImageUploadController extends Controller
                     'compressed_size'   => $compressData['compressed_size']
                 ];
 
-                DeleteOriginalImageJob::dispatch($path)->delay(now()->addSeconds(3));
-                DeleteCompressedImageJob::dispatch($compressedPath)->delay(now()->addSeconds(3));
+                DeleteOriginalImageJob::dispatch($path)->delay(now()->addMinutes(30));
+                DeleteCompressedImageJob::dispatch($compressedPath)->delay(now()->addMinutes(30));
             }
 
             Image::insert($imagePath);
