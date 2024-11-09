@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\DeleteCompressedImageJob;
+use App\Jobs\DeleteOriginalImageJob;
 use App\Models\Image;
-use Intervention\Image\Laravel\Facades\Image as Gambar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Encoders\AutoEncoder;
-use Intervention\Image\Encoders\WebpEncoder;
-use Intervention\Image\Encoders\GifEncoder;
-use Intervention\Image\Encoders\PngEncoder;
 
 class ImageUploadController extends Controller
 {
@@ -57,10 +52,12 @@ class ImageUploadController extends Controller
 
             foreach ($images as $image) {
                 $originalName   = $image->getClientOriginalName();
-                $path           = $image->store("images/{$year}/{$month}/{$day}", 'public');
+                $path           = $image->store("images/{$year}/{$month}/{$day}", 'public');                
                 
-                $encodeName = str_replace("images/{$year}/{$month}/{$day}", '', $path);
-                $compress = $this->compressImage($image, $path, "compressed/{$year}/{$month}/{$day}/{$encodeName}");
+                $encodeName     = str_replace("images/{$year}/{$month}/{$day}", '', $path);
+                $compressedPath = "compressed/{$year}/{$month}/{$day}/{$encodeName}";
+
+                $compress = $this->compressImage($image, $compressedPath);
 
                 $compressData = json_decode($compress->getContent(), true);
 
@@ -75,6 +72,9 @@ class ImageUploadController extends Controller
                     'compressed_path'   => $compressData['compressed_image'],
                     'compressed_size'   => $compressData['compressed_size']
                 ];
+
+                DeleteOriginalImageJob::dispatch($path)->delay(now()->addSeconds(3));
+                DeleteCompressedImageJob::dispatch($compressedPath)->delay(now()->addSeconds(3));
             }
 
             Image::insert($imagePath);
@@ -91,9 +91,9 @@ class ImageUploadController extends Controller
         }
     }
 
-    function compressImage($image, $sourcePath, $destinationPath) {
+    function compressImage($image, $destinationPath) {
         try {
-            $image = ImageManager::gd()->read(storage_path('app/public/' . $sourcePath));
+            $image = ImageManager::gd()->read($image);
             
             $fullDestinationPath = storage_path('app/public/' . $destinationPath);
 
@@ -110,7 +110,6 @@ class ImageUploadController extends Controller
 
             return response()->json([
                 'status'            => 200,
-                'original_image'    => env('APP_URL') . '/' . $sourcePath,
                 'compressed_image'  => env('APP_URL') . '/storage/' . $destinationPath,
                 'compressed_size'   => $imageSize
             ], 200);
