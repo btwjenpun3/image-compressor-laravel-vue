@@ -16,5 +16,5 @@ Route::prefix('/upload')
     ->controller(ImageUploadController::class)
     ->group(function() {
         Route::get('/', 'index')->name('index');
-        Route::post('/', 'upload')->name('upload');
+        Route::post('/', 'upload')->name('upload')->middleware('throttle:60,1');
     });

@@ -28,7 +28,7 @@ class ImageUploadController extends Controller
     {
         $request->validate([
             'images'            => 'required|array|max:5',
-            'images.*'          => 'required|file|mimes:jpeg,jpg|max:9196',
+            'images.*'          => 'required|file|mimes:jpeg,jpg|max:10512',
             'recaptcha_token'   => 'required|string',
         ]);
 
