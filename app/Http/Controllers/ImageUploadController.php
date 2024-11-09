@@ -111,7 +111,7 @@ class ImageUploadController extends Controller
             return response()->json([
                 'status'            => 200,
                 'original_image'    => env('APP_URL') . '/' . $sourcePath,
-                'compressed_image'  => env('APP_URL') . '/' . $destinationPath,
+                'compressed_image'  => env('APP_URL') . '/storage/' . $destinationPath,
                 'compressed_size'   => $imageSize
             ], 200);
 
