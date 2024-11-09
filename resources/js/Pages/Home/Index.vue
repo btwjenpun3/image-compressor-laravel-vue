@@ -35,6 +35,9 @@
                     </a>
                 </div>
             </div>
+            <p class="text-yellow-600 mt-5">
+                * Semua gambar ini berada di server kami hanya 30 menit. Harap download gambar sebelum 30 menit.
+            </p>
         </div>
         <div v-else class="cursor-pointer" @click="upload">
             <div class="text-center">
